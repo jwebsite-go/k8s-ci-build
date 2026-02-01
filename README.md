@@ -1,70 +1,71 @@
-# Kubernetes CICD Tutorial
+# k8s-ci-build
 
-This repo contains all the code needed to follow along with our **[YouTube Tutorial](https://youtu.be/GlhK7mz5IJo)** or **[Written Article](https://rslim087a.github.io/rayanslim/lesson.html?course=kubernetes-cicd-course&lesson=introduction)**.
+A Node.js application with a fully automated CI/CD pipeline that builds, containerizes, and deploys to Kubernetes using GitHub Actions.
+
+## Overview
+
+This project demonstrates an end-to-end CI/CD workflow for a JavaScript application. The pipeline automatically builds a Docker image on every push and deploys it to a Kubernetes cluster, ensuring fast and reliable delivery.
+
+## Project Structure
+
+
+├── .github/workflows/   # GitHub Actions CI/CD pipeline configuration
+├── src/                 # Application source code (Node.js)
+├── Dockerfile           # Docker image build configuration
+└── README.md            # Project documentation
+
+
+## Tech Stack
+
+•⁠  ⁠*Runtime:* Node.js
+•⁠  ⁠*Containerization:* Docker
+•⁠  ⁠*CI/CD:* GitHub Actions
+•⁠  ⁠*Orchestration:* Kubernetes
 
 ## Prerequisites
 
-To follow along with this tutorial, you'll need:
+Before running this project locally, make sure you have the following installed:
 
-- kubectl installed and configured ([https://youtu.be/IBkU4dghY0Y](https://youtu.be/IBkU4dghY0Y))
-- Helm installed: ([https://rslim087a.github.io/rayanslim/lesson.html?course=prometheus-grafana-monitoring-course&lesson=helm-installation](https://rslim087a.github.io/rayanslim/lesson.html?course=prometheus-grafana-monitoring-course&lesson=helm-installation))
-- A GitHub account: ([https://github.com/](https://github.com/))
+•⁠  ⁠[Node.js](https://nodejs.org/) (v16 or higher)
+•⁠  ⁠[Docker](https://www.docker.com/)
+•⁠  ⁠[kubectl](https://kubernetes.io/docs/tasks/tools/) — configured and connected to your cluster
 
-## Install ArgoCD
+## Getting Started
 
-```bash
-helm repo add argo https://argoproj.github.io/argo-helm
-helm repo update
-kubectl create namespace argocd
-helm install argocd argo/argo-cd --namespace argocd --version 7.7.0
-```
+1.⁠ ⁠Clone the repository:
 
-## Access ArgoCD UI
+⁠ bash
+git clone https://github.com/jwebsite-go/k8s-ci-build.git
+cd k8s-ci-build
+ ⁠
 
-```bash
-kubectl port-forward svc/argocd-server -n argocd 8080:80
-```
+1.⁠ ⁠Install dependencies:
 
-## Retrieve Credentials
+⁠ bash
+npm install
+ ⁠
 
-```bash
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-```
-## ArgoCD Application
+1.⁠ ⁠Run locally:
 
-```yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: grade-submission-api
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/YOUR_USERNAME/grade-api-gitops.git
-    targetRevision: HEAD
-    path: .
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: default
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-```
+⁠ bash
+npm start
+ ⁠
 
-## Creating Image Pull Secrets
+## Docker
 
-To allow Kubernetes to pull images from GitHub Container Registry:
+Build the image manually:
 
-```yaml
-kubectl create secret docker-registry ghcr-secret \\
-  --docker-server=ghcr.io \\
-  --docker-username=YOUR_USERNAME \\
-  --docker-password=YOUR_PAT \\
-  --namespace=default
-```
+⁠ bash
+docker build -t k8s-ci-build .
+docker run -p 3000:3000 k8s-ci-build
+ ⁠
 
-### Become a Cloud and DevOps Engineer
+## CI/CD Pipeline
 
-Visit[https://rslim087a.github.io/rayanslim](https://rslim087a.github.io/rayanslim)
+The GitHub Actions workflow (located in ⁠ .github/workflows/ ⁠) automates the following steps on every push to the main branch:
+
+1.⁠ ⁠Installs dependencies and runs tests
+1.⁠ ⁠Builds a Docker image
+1.⁠ ⁠Pushes the image to the container registry
+1.⁠ ⁠Deploys the updated image to the Kubernetes cluster
+
